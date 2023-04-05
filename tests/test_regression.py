@@ -3,6 +3,8 @@ import os
 import uuid
 import sqlite3
 import platform
+import pytest
+import unittest
 
 import tables
 import numpy as np
@@ -10,8 +12,6 @@ from numpy.testing import assert_array_almost_equal
 from numpy.testing import assert_almost_equal
 from cyclus.lib import Env
 
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true
 
 
 import helper
@@ -24,23 +24,21 @@ ALLOW_MILPS = Env().allow_milps
 def skip_if_dont_allow_milps():
     """A don't run certain tests if MILPs are disabled."""
     if not ALLOW_MILPS:
-        raise SkipTest("Cyclus was compiled without MILPS support or the "
+        raise pytest.skip("Cyclus was compiled without MILPS support or the "
                        "ALLOW_MILPS env var was not set to true.")
 
 
-class TestRegression(object):
+class TestRegression(unittest.TestCase):
     """A base class for all regression tests. A derived class is required for
     each new input file to be tested. Each derived class *must* declare an `inf`
-    member in their `__init__` function that points to the input file to be
+    member in their `setUp` function that points to the input file to be
     tested, e.g., `self.inf_ = ./path/to/my/input_file.xml. See below for
     examples.
     """
-    def __init__(self, *args, **kwargs):
+    def setUp(self):
         self.ext = '.sqlite'
         self.outf = str(uuid.uuid4()) + self.ext
         self.inf = None
-
-    def setUp(self):
         if not self.inf:
             raise TypeError(("self.inf must be set in derived classes "
                              "to run regression tests."))
@@ -110,8 +108,6 @@ class _PhysorEnrichment(TestRegression):
     Cyclus Physor 2014 publication. The number of key facilities, the enrichment
     values, and the transactions to each reactor are tested.
     """
-    def __init__(self, *args, **kwargs):
-        super(_PhysorEnrichment, self).__init__(*args, **kwargs)
 
     def setUp(self):
         super(_PhysorEnrichment, self).setUp()
@@ -120,8 +116,8 @@ class _PhysorEnrichment(TestRegression):
         self.enr_id = self.find_ids(":cycamore:Enrichment", tbl)
 
     def test_deploy(self):
-        assert_equal(len(self.rx_id), 2)
-        assert_equal(len(self.enr_id), 1)
+        assert len(self.rx_id) ==  2
+        assert len(self.enr_id) ==  1
 
     def test_swu(self):
         enr = self.enrichments
@@ -167,14 +163,14 @@ class _PhysorEnrichment(TestRegression):
         assert_array_almost_equal(exp, txs, decimal=2, err_msg=msg)
 
 class TestCBCPhysorEnrichment(_PhysorEnrichment):
-    def __init__(self, *args, **kwargs):
-        super(TestCBCPhysorEnrichment, self).__init__(*args, **kwargs)
+    def setUp(self, *args, **kwargs):
+        super(TestCBCPhysorEnrichment, self).setUp(*args, **kwargs)
         self.inf = "../input/physor/1_Enrichment_2_Reactor.xml"
         skip_if_dont_allow_milps()
 
 class TestGreedyPhysorEnrichment(_PhysorEnrichment):
-    def __init__(self, *args, **kwargs):
-        super(TestGreedyPhysorEnrichment, self).__init__(*args, **kwargs)
+    def setUp(self, *args, **kwargs):
+        super(TestGreedyPhysorEnrichment, self).setUp(*args, **kwargs)
         self.inf = "../input/physor/greedy_1_Enrichment_2_Reactor.xml"
 
 class _PhysorSources(TestRegression):
@@ -182,8 +178,6 @@ class _PhysorSources(TestRegression):
     Physor 2014 publication. Reactor deployment and transactions between
     suppliers and reactors are tested.
     """
-    def __init__(self, *args, **kwargs):
-        super(_PhysorSources, self).__init__(*args, **kwargs)
 
     def setUp(self):
         super(_PhysorSources, self).setUp()
@@ -200,9 +194,9 @@ class _PhysorSources(TestRegression):
     def test_rxtr_deployment(self):
         depl_time = {x["AgentId"]: x["EnterTime"] for x in self.agent_entry}
 
-        assert_equal(depl_time[self.r1], 1)
-        assert_equal(depl_time[self.r2], 2)
-        assert_equal(depl_time[self.r3], 3)
+        assert depl_time[self.r1] ==  1
+        assert depl_time[self.r2] ==  2
+        assert depl_time[self.r3] ==  3
 
     def test_rxtr1_xactions(self):
         mox_exp = [0, 1, 1, 1, 0]
@@ -250,14 +244,14 @@ class _PhysorSources(TestRegression):
         assert_array_almost_equal(uox_exp, txs)
 
 class TestCBCPhysorSources(_PhysorSources):
-    def __init__(self, *args, **kwargs):
-        super(TestCBCPhysorSources, self).__init__(*args, **kwargs)
+    def setUp(self, *args, **kwargs):
+        super(TestCBCPhysorSources, self).setUp(*args, **kwargs)
         self.inf = "../input/physor/2_Sources_3_Reactors.xml"
         skip_if_dont_allow_milps()
 
 class TestGreedyPhysorSources(_PhysorSources):
-    def __init__(self, *args, **kwargs):
-        super(TestGreedyPhysorSources, self).__init__(*args, **kwargs)
+    def setUp(self, *args, **kwargs):
+        super(TestGreedyPhysorSources, self).setUp(*args, **kwargs)
         self.inf = "../input/physor/greedy_2_Sources_3_Reactors.xml"
 
 class TestDynamicCapacitated(TestRegression):
@@ -278,15 +272,13 @@ class TestDynamicCapacitated(TestRegression):
     facilities being the constraint. At time step 3, after decommissioning 2
     older sink facilities, the remaining number of sink facilities becomes
     the constraint, resulting in the same transaction amount as in time step 1.
-    """
-    def __init__(self, *args, **kwargs):
-        super(TestDynamicCapacitated, self).__init__(*args, **kwargs)
-        self.inf = "./input/dynamic_capacitated.xml"
-        if not cyclus_has_coin():
-            raise SkipTest('Cyclus not compiled with COIN')
+    """ 
 
     def setUp(self):
         super(TestDynamicCapacitated, self).setUp()
+        self.inf = "./input/dynamic_capacitated.xml"
+        if not cyclus_has_coin():
+            raise pytest.skip('Cyclus not compiled with COIN')
 
         # Find agent ids of source and sink facilities
         self.agent_ids = self.to_ary(self.agent_entry, "AgentId")
@@ -312,47 +304,39 @@ class TestDynamicCapacitated(TestRegression):
 
     def test_source_deployment(self):
         # test number of sources
-        assert_equal(len(self.source_id), 3)
+        assert len(self.source_id) ==  3
         # Test that source facilities are all deployed at time step 1
         for s in self.source_id:
-            assert_equal(self.depl_time[np.where(self.agent_ids == s)], 1)
+            assert self.depl_time[np.where(self.agent_ids == s)] ==  1
 
     def test_sink_deployment(self):
         # test number of sinks
-        assert_equal(len(self.sink_id), 4)
+        assert len(self.sink_id) ==  4
         # Test that first 2 sink facilities are deployed at time step 1
         # and decommissioned at time step 2
         for i in [0, 1]:
-            assert_equal(
-                self.depl_time[np.where(self.agent_ids == self.sink_id[i])][0],
-                1)
-            assert_equal(
-                self.exit_time[np.where(self.exit_ids == self.sink_id[i])][0],
-                2)
+            assert self.depl_time[np.where(self.agent_ids == self.sink_id[i])][0] ==  1
+            assert self.exit_time[np.where(self.exit_ids == self.sink_id[i])][0] == 2
         # Test that second 2 sink facilities are deployed at time step 2
         # and decommissioned at time step 3
         for i in [2, 3]:
-            assert_equal(
-                self.depl_time[np.where(self.agent_ids == self.sink_id[i])][0],
-                2)
-            assert_equal(
-                self.exit_time[np.where(self.exit_ids == self.sink_id[i])][0],
-                3)
+            assert self.depl_time[np.where(self.agent_ids == self.sink_id[i])][0] == 2
+            assert self.exit_time[np.where(self.exit_ids == self.sink_id[i])][0] == 3
 
     def test_xaction_general(self):
         # Check that transactions are between sources and sinks only
         for s in self.sender_ids:
-            assert_equal(len(np.where(self.source_id == s)[0]), 1)
+            assert len(np.where(self.source_id == s)[0]) ==  1
         for r in self.receiver_ids:
-            assert_equal(len(np.where(self.sink_id == r)[0]), 1)
+            assert len(np.where(self.sink_id == r)[0]) ==  1
         # Total expected number of transactions
-        assert_equal(len(self.trans_time), 7)
+        assert len(self.trans_time) ==  7
         # Check that at time step 1, there are 2 transactions
-        assert_equal(len(np.where(self.trans_time == 1)[0]), 2)
+        assert len(np.where(self.trans_time == 1)[0]) ==  2
         # Check that at time step 2, there are 3 transactions
-        assert_equal(len(np.where(self.trans_time == 2)[0]), 3)
+        assert len(np.where(self.trans_time == 2)[0]) ==  3
         # Check that at time step 3, there are 2 transactions
-        assert_equal(len(np.where(self.trans_time == 3)[0]), 2)
+        assert len(np.where(self.trans_time == 3)[0]) ==  2
 
     def test_xaction_specific(self):
         # Check that at time step 1, there are 2 transactions with total
@@ -361,7 +345,7 @@ class TestDynamicCapacitated(TestRegression):
         for t in np.where(self.trans_time == 1)[0]:
             quantity += self.quantities[
                 np.where(self.resource_ids == self.trans_resource[t])]
-        assert_equal(quantity, 2)
+        assert quantity ==  2
 
         # Check that at time step 2, there are 3 transactions with total
         # amount of 3
@@ -369,7 +353,7 @@ class TestDynamicCapacitated(TestRegression):
         for t in np.where(self.trans_time == 2)[0]:
             quantity += self.quantities[
                 np.where(self.resource_ids == self.trans_resource[t])]
-        assert_equal(quantity, 3)
+        assert quantity ==  3
 
         # Check that at time step 3, there are 2 transactions with total
         # amount of 2
@@ -377,7 +361,7 @@ class TestDynamicCapacitated(TestRegression):
         for t in np.where(self.trans_time == 3)[0]:
             quantity += self.quantities[
                 np.where(self.resource_ids == self.trans_resource[t])]
-        assert_equal(quantity, 2)
+        assert quantity ==  2
 
 class TestGrowth1(TestRegression):
     """This class tests the growth.xml
@@ -393,14 +377,11 @@ class TestGrowth1(TestRegression):
     A linear growth demand (y = 0x + 3) for a second commodity is provided at t=2
     to test the demand for multiple commodities.
     """
-    def __init__(self, *args, **kwargs):
-        super(TestGrowth1, self).__init__(*args, **kwargs)
-        self.inf = "./input/growth.xml"
-        if not cyclus_has_coin():
-            raise SkipTest('Cyclus not compiled with COIN')
-
     def setUp(self):
         super(TestGrowth1, self).setUp()
+        self.inf = "./input/growth.xml"
+        if not cyclus_has_coin():
+            raise pytest.skip('Cyclus not compiled with COIN')
 
     def tearDown(self):
         super(TestGrowth1, self).tearDown()
@@ -418,15 +399,15 @@ class TestGrowth1(TestRegression):
         source3_id = self.find_ids("Source3", self.agent_entry,
                                    spec_col="Prototype")
 
-        assert_equal(len(source2_id), 1)
-        assert_equal(len(source1_id), 2)
-        assert_equal(len(source3_id), 3)
+        assert len(source2_id) ==  1
+        assert len(source1_id) ==  2
+        assert len(source3_id) ==  3
 
-        assert_equal(enter_time[np.where(agent_ids == source2_id[0])], 1)
-        assert_equal(enter_time[np.where(agent_ids == source1_id[0])], 2)
-        assert_equal(enter_time[np.where(agent_ids == source1_id[1])], 3)
+        assert enter_time[np.where(agent_ids == source2_id[0])] ==  1
+        assert enter_time[np.where(agent_ids == source1_id[0])] ==  2
+        assert enter_time[np.where(agent_ids == source1_id[1])] ==  3
         for x in source3_id:
-            assert_equal(enter_time[np.where(agent_ids == x)], 2)
+            assert enter_time[np.where(agent_ids == x)] ==  2
 
 class TestGrowth2(TestRegression):
     """This class tests the ./input/deploy_and_manager_insts.xml
@@ -440,14 +421,11 @@ class TestGrowth2(TestRegression):
     t=6, 4 1-capacity Source2s are expected to be built by the ManagerInst.
 
     """
-    def __init__(self, *args, **kwargs):
-        super(TestGrowth2, self).__init__(*args, **kwargs)
-        self.inf = "../input/growth/deploy_and_manager_insts.xml"
-        if not cyclus_has_coin():
-            raise SkipTest('Cyclus not compiled with COIN')
-
     def setUp(self):
         super(TestGrowth2, self).setUp()
+        self.inf = "../input/growth/deploy_and_manager_insts.xml"
+        if not cyclus_has_coin():
+            raise pytest.skip('Cyclus not compiled with COIN')
 
     def tearDown(self):
         super(TestGrowth2, self).tearDown()
@@ -463,11 +441,11 @@ class TestGrowth2(TestRegression):
         source2_id = self.find_ids("Source2", self.agent_entry,
                                    spec_col="Prototype")
 
-        assert_equal(len(source1_id), 1)
-        assert_equal(len(source2_id), 4)
+        assert len(source1_id) ==  1
+        assert len(source2_id) ==  4
 
-        assert_equal(enter_time[np.where(agent_ids == source1_id[0])], 1)
-        assert_equal(enter_time[np.where(agent_ids == source2_id[0])], 6)
+        assert enter_time[np.where(agent_ids == source1_id[0])] ==  1
+        assert enter_time[np.where(agent_ids == source2_id[0])] ==  6
 
 class TestDeployInst(TestRegression):
     """This class tests the ../input/deploy_inst.xml
@@ -482,14 +460,11 @@ class TestDeployInst(TestRegression):
     number of these agents are deployed.
 
     """
-    def __init__(self, *args, **kwargs):
-        super(TestDeployInst, self).__init__(*args, **kwargs)
-        self.inf = "../input/deploy_inst.xml"
-        if not cyclus_has_coin():
-            raise SkipTest('Cyclus not compiled with COIN')
-
     def setUp(self):
         super(TestDeployInst, self).setUp()
+        self.inf = "../input/deploy_inst.xml"
+        if not cyclus_has_coin():
+            raise pytest.skip('Cyclus not compiled with COIN')
 
     def tearDown(self):
         super(TestDeployInst, self).tearDown()
@@ -504,17 +479,17 @@ class TestDeployInst(TestRegression):
                                    spec_col="Prototype")
         sink_id = self.find_ids("Sink", self.agent_entry, spec_col="Prototype")
 
-        assert_equal(len(source_id), 1)
-        assert_equal(len(sink_id), 1)
+        assert len(source_id) ==  1
+        assert len(sink_id) ==  1
 
-        assert_equal(enter_time[np.where(agent_ids == source_id[0])], 1)
-        assert_equal(enter_time[np.where(agent_ids == sink_id[0])], 0)
+        assert enter_time[np.where(agent_ids == source_id[0])] ==  1
+        assert enter_time[np.where(agent_ids == sink_id[0])] ==  0
 
 class _Recycle(TestRegression):
     """This class tests the input/recycle.xml file.
     """
-    def __init__(self, *args, **kwargs):
-        super(_Recycle, self).__init__(*args, **kwargs)
+    def setUp(self, *args, **kwargs):
+        super(_Recycle, self).setUp(*args, **kwargs)
 
         # this test requires separations which isn't supported by hdf5
         # so we force sqlite:
@@ -604,14 +579,14 @@ class _Recycle(TestRegression):
 class TestGreedyRecycle(_Recycle):
     """This class tests the input/recycle.xml file.
     """
-    def __init__(self, *args, **kwargs):
-        super(TestGreedyRecycle, self).__init__(*args, **kwargs)
+    def setUp(self, *args, **kwargs):
+        super(TestGreedyRecycle, self).setUp(*args, **kwargs)
         self.inf = "../input/greedy_recycle.xml"
 
 class TestCbcRecycle(_Recycle):
     """This class tests the input/recycle.xml file.
     """
-    def __init__(self, *args, **kwargs):
-        super(TestCbcRecycle, self).__init__(*args, **kwargs)
+    def setUp(self, *args, **kwargs):
+        super(TestCbcRecycle, self).setUp(*args, **kwargs)
         self.inf = "../input/recycle.xml"
         skip_if_dont_allow_milps()
