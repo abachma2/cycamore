@@ -29,8 +29,6 @@ USE_CYCLUS("cycamore" "storage")
 
 USE_CYCLUS("cycamore" "bulk_reactor")
 
-USE_CYCLUS("cycamore" "general_facility")
-
 INSTALL_CYCLUS_MODULE("cycamore" "" "NONE")
 
 SET(TestSource ${cycamore_TEST_CC} PARENT_SCOPE)
