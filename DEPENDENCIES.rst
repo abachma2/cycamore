@@ -3,7 +3,7 @@ Installing Cycamore Dependencies from Binaries
 ##############################################
 
 To see user and developer documentation for this code, please visit
-the `Cyclus Homepage <https://github.com/cyclus/cyclust `_.
+the `Cyclus Homepage <https://github.com/cyclus/cyclus>`_.
 
 This method describes two methods for installing Cycamore's only dependency,
 the Cyclus Core, from binary distributions.  If you would like to install it
