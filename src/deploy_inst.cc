@@ -41,15 +41,17 @@ void DeployInst::Build(cyclus::Agent* parent) {
                             context()->sim_info().duration)/12);
     std::cout << build_times[i] + (deployyear[i] - y) << std::endl;
     int t = build_times[i];
- 
-    if(deployyear[i] > sim_end){
-      ss << " Deploy start year " <<  deployyear[i] << " must be less than simulation duration";
-      throw cyclus::ValueError(ss.str());
-      }
-      else{
-        int t = (deployyear[i] < y) ? 1 : build_times[i] + (deployyear[i] - y); 
-
-      } 
+    if(deployyear.size() != 0){
+      if(deployyear[i] > sim_end){
+        ss << " Deploy start year " <<  deployyear[i] << " must be less than simulation duration";
+        throw cyclus::ValueError(ss.str());
+        }
+        else{
+          int t = (deployyear[i] < y) ? 1 : build_times[i] + (deployyear[i] - y); 
+        } 
+    } else {
+        int t = build_times[i];
+    }
     std::cout << t << std::endl;
     for (int j = 0; j < n_build[i]; j++) {
         context()->SchedBuild(this, proto, t);
@@ -76,12 +78,12 @@ void DeployInst::EnterNotify() {
        << " lifetimes vals, expected " << n;
     throw cyclus::ValueError(ss.str());
   }
-  // else if (deployyear.size() > 0 && deployyear.size() != n) {
-  //   std::stringstream ss;
-  //   ss << "prototype '" << prototype() << "' has " << deployyear.size()
-  //      << " start year vals, expected " << n;
-  //   throw cyclus::ValueError(ss.str());
-  // }
+  else if (deployyear.size() > 0 && deployyear.size() != n) {
+    std::stringstream ss;
+    ss << "prototype '" << prototype() << "' has " << deployyear.size()
+       << " start year vals, expected " << n;
+    throw cyclus::ValueError(ss.str());
+  }
 
 
   InitializePosition();
