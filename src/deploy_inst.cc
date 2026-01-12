@@ -76,12 +76,12 @@ void DeployInst::EnterNotify() {
        << " lifetimes vals, expected " << n;
     throw cyclus::ValueError(ss.str());
   }
-  // else if (deployyear.size() > 0 && deployyear.size() != n) {
-  //   std::stringstream ss;
-  //   ss << "prototype '" << prototype() << "' has " << deployyear.size()
-  //      << " start year vals, expected " << n;
-  //   throw cyclus::ValueError(ss.str());
-  // }
+  else if (deployyear.size() > 0 && deployyear.size() != n) {
+    std::stringstream ss;
+    ss << "prototype '" << prototype() << "' has " << deployyear.size()
+       << " start year vals, expected " << n;
+    throw cyclus::ValueError(ss.str());
+  }
 
 
   InitializePosition();
