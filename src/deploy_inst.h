@@ -84,12 +84,10 @@ class DeployInst :
   }
   std::vector<int> n_build;
 
-  #pragma cyclus var {							\
+  #pragma cyclus var {	\
     "doc": "start_year", \
-    "default":[],\
     "uilabel": "Start Year" \
   }
-
   std::vector<int> start_year;
 
   #pragma cyclus var {							\
