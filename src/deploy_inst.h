@@ -84,6 +84,16 @@ class DeployInst :
   }
   std::vector<int> n_build;
 
+  #pragma cyclus var {							\
+    "doc": "start_year", \
+    "uilabel": "Start Year" \
+  }
+  int start_year;
+
+  int y;
+  int m0;
+  int dur;
+  int sim_end; 
 
   #pragma cyclus var {							\
     "doc": "Lifetimes for each prototype in prototype list (same order)." \
