@@ -41,20 +41,19 @@ void DeployInst::Build(cyclus::Agent* parent) {
                             context()->sim_info().duration)/12);
     std::cout << build_times[i] + (deployyear[i] - y) << std::endl;
     int t = build_times[i];
+ 
     if(deployyear[i] > sim_end){
       ss << " Deploy start year " <<  deployyear[i] << " must be less than simulation duration";
       throw cyclus::ValueError(ss.str());
-    }
-    else{
-      int t = (deployyear[i] < y) ? 0 : build_times[i] + (deployyear[i] - y); 
-      std::cout << t << std::endl;
-      for (int j = 0; j < n_build[i]; j++) {
-        context()->SchedBuild(this, proto, t);
       }
+      else{
+        int t = (deployyear[i] < y) ? 1 : build_times[i] + (deployyear[i] - y); 
+
+      } 
+    std::cout << t << std::endl;
+    for (int j = 0; j < n_build[i]; j++) {
+        context()->SchedBuild(this, proto, t);
     }
-    // for (int j = 0; j < n_build[i]; j++) {
-    //     context()->SchedBuild(this, proto, t);
-    // }
   }
 }
 
