@@ -43,7 +43,7 @@ void DeployInst::Build(cyclus::Agent* parent) {
     int t = build_times[i];
     if(deployyear.size() == prototypes.size()){
       if(deployyear[i] > sim_end){
-        ss << " Deploy start year " <<  deployyear[i] << " must be less than simulation duration";
+        ss << "'s deploy start year, " <<  deployyear[i] << ", must be less than simulation duration";
         throw cyclus::ValueError(ss.str());
         }
         else{
