@@ -85,8 +85,8 @@ class DeployInst :
   std::vector<int> n_build;
 
   #pragma cyclus var {	\
-    "doc": "start_year", \
-    "uilabel": "Start Year" \
+    "doc": "Each institution may be deployed at a start year different to the simulation start year. ", \
+    "uilabel": "Start year to begin deployment" \
   }
   std::vector<int> start_year;
 
