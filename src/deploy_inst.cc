@@ -47,7 +47,7 @@ void DeployInst::Build(cyclus::Agent* parent) {
         throw cyclus::ValueError(ss.str());
         }
         else{
-          int t = (deployyear[i] < y) ? 1 : build_times[i] + (deployyear[i] - y); 
+          int t = (deployyear[i] < y) ? 0 : build_times[i] + (deployyear[i] - y); 
         } 
     } 
 
