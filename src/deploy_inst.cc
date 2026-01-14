@@ -17,13 +17,13 @@ void DeployInst::Build(cyclus::Agent* parent) {
 
     std::stringstream ss;
     ss << proto;
-
+    // either decomnotif can be editted or we can always adjust the lifetimes 
     if (lifetimes.size() == prototypes.size()) {
       cyclus::Agent* a = context()->CreateAgent<Agent>(proto);
       if (a->lifetime() != lifetimes[i]) {
         a->lifetime(lifetimes[i]);
 
-        if (lifetimes[i] == -1) {
+        if (lifetimes[i] == -1 ) {
           ss << "_life_forever";
         } else {
           ss << "_life_" << lifetimes[i];
@@ -39,7 +39,7 @@ void DeployInst::Build(cyclus::Agent* parent) {
     int y = context()->sim_info().y0;
     int sim_end = y + std::floor((context()->sim_info().m0 + 
                             context()->sim_info().duration)/12);
-
+    // need to convert deployyear to times 
     int t = build_times[i];
     if(deployyear.size() == prototypes.size()){
       if(deployyear[i] > sim_end){
@@ -47,7 +47,7 @@ void DeployInst::Build(cyclus::Agent* parent) {
         throw cyclus::ValueError(ss.str());
         }
         else{
-          int t = (deployyear[i] < y) ? 0 : build_times[i] + (deployyear[i] - y); 
+          int t = (deployyear[i] < y) ? 0 : build_times[i] + (deployyear[i] - y)*12; 
         } 
     } 
 
