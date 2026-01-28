@@ -154,6 +154,26 @@ TEST_F(DeployInstTests, NoDupProtos) {
   EXPECT_EQ(1, stmt->GetInt(0));
 }
 
+TEST_F(DeployInstTests, DeployYear) {
+  std::string config =
+     "<prototypes>  <val>foobar</val> </prototypes>"
+     "<build_times> <val>2</val>      </build_times>"
+     "<n_build>     <val>3</val>      </n_build>"
+     "<lifetimes>   <val>10</val>     </lifetimes>"
+     ;
+
+  int simdur = 15;
+  cyclus::MockSim sim(cyclus::AgentSpec(":cycamore:DeployInst"), config, simdur);
+  sim.DummyProto("foobar");
+  int id = sim.Run();
+
+  cyclus::SqlStatement::Ptr stmt = sim.db().db().Prepare(
+      "SELECT ExitTime from AgentExit AS x INNER JOIN AgentEntry AS e ON x.AgentId = e.AgentId"
+      );
+  stmt->Step();
+  EXPECT_EQ(11, stmt->GetInt(0));
+}
+
 TEST_F(DeployInstTests, PositionInitialize) {
   std::string config =
      "<prototypes>  <val>foobar</val> </prototypes>"
