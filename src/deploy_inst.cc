@@ -1,5 +1,6 @@
 // Implements the DeployInst class
 #include "deploy_inst.h"
+#include "error.h"
 
 namespace cycamore {
 
@@ -36,30 +37,31 @@ void DeployInst::Build(cyclus::Agent* parent) {
       }
     }
 
-    int y = context()->sim_info().y0; 
-    int sim_end = y + std::floor((context()->sim_info().m0 + 
-                            context()->sim_info().duration)/12); 
-    int t = build_times[i]; 
-    if(deployyear.size() == prototypes.size()){ 
-      if(deployyear[i] + build_times[i] => sim_end){
-        Warn<VALUE_WARNING>(
-        "deployment year, " <<  deployyear[i] + build_times[i] << ", must be less than simulation duration");
-        int t = build_times[i] + std::abs(deploy_year[i] - y)*12; 
-      } 
-      else if(deploy_year[i] + build_times[i] < y) {
-        Warn<EXPERIMENTAL_WARNING>(
-        "Facility deployment before simulation start is under development. Deployment time is reset to simulation start (t = 0).");
-        int t = 0;
+    int sim_start = 12*(context()->sim_info().y0) + 
+                            context()->sim_info().m0;
+    int t_build = build_times[i]; 
+
+    if(deployyear.size() == prototypes.size()) { 
+      if(t_build + deployyear[i]*12 < sim_start){
+          cyclus::Warn<cyclus::VALUE_WARNING>(
+          "Facility deployment before simulation start is under development. Deployment time is reset to simulation start (t = 0).");
+          t_build = 0;
       }
-      else {
-        int t = build_times[i] + std::abs(deploy_year[i] - y)*12; 
+     else {
+        t_build += deployyear[i]*12 - sim_start;
+        if(t_build >= context()->sim_info().duration) {
+          cyclus::Warn<cyclus::VALUE_WARNING>(
+          "Deployment year must be less than simulation duration");
+        }
       }
     }
+
     for (int j = 0; j < n_build[i]; j++) {
-        context()->SchedBuild(this, proto, t);
+        context()->SchedBuild(this, proto, t_build);
     }
   }
 }
+
 
 void DeployInst::EnterNotify() {
   cyclus::Institution::EnterNotify();
