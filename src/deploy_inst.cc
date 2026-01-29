@@ -45,7 +45,7 @@ void DeployInst::Build(cyclus::Agent* parent) {
       if(t_build + deployyear[i]*12 < sim_start){
           cyclus::Warn<cyclus::VALUE_WARNING>(
           "Facility deployment before simulation start is under development. Deployment time is reset to simulation start (t = 0).");
-          t_build = 0;
+          t_build = 1;
       }
      else {
         t_build += deployyear[i]*12 - sim_start;
@@ -55,7 +55,6 @@ void DeployInst::Build(cyclus::Agent* parent) {
         }
       }
     }
-
     for (int j = 0; j < n_build[i]; j++) {
         context()->SchedBuild(this, proto, t_build);
     }

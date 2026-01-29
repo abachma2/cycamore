@@ -153,25 +153,45 @@ TEST_F(DeployInstTests, NoDupProtos) {
   stmt->Step();
   EXPECT_EQ(1, stmt->GetInt(0));
 }
-
+//this test makes sure that the institutions deployed before sim start are reset to 1. 
 TEST_F(DeployInstTests, DeployYear) {
   std::string config =
      "<prototypes>  <val>foobar</val> </prototypes>"
      "<build_times> <val>2</val>      </build_times>"
      "<n_build>     <val>3</val>      </n_build>"
-     "<lifetimes>   <val>10</val>     </lifetimes>"
+     "<deployyear>  <val>2012</val>      </deployyear>"
      ;
 
-  int simdur = 15;
+  int simdur = 30;
   cyclus::MockSim sim(cyclus::AgentSpec(":cycamore:DeployInst"), config, simdur);
   sim.DummyProto("foobar");
   int id = sim.Run();
 
   cyclus::SqlStatement::Ptr stmt = sim.db().db().Prepare(
-      "SELECT ExitTime from AgentExit AS x INNER JOIN AgentEntry AS e ON x.AgentId = e.AgentId"
+      "SELECT COUNT(*) FROM AgentEntry WHERE Prototype = 'foobar' AND EnterTime = '25';"
       );
   stmt->Step();
-  EXPECT_EQ(11, stmt->GetInt(0));
+  EXPECT_EQ(3, stmt->GetInt(0)); //start year is 2010
+}
+
+TEST_F(DeployInstTests, DeployYear2) {
+  std::string config =
+     "<prototypes>  <val>foobar</val> </prototypes>"
+     "<build_times> <val>2</val>      </build_times>"
+     "<n_build>     <val>3</val>      </n_build>"
+     "<deployyear>  <val>2009</val>      </deployyear>"
+     ;
+
+  int simdur = 5;
+  cyclus::MockSim sim(cyclus::AgentSpec(":cycamore:DeployInst"), config, simdur);
+  sim.DummyProto("foobar");
+  int id = sim.Run();
+
+  cyclus::SqlStatement::Ptr stmt = sim.db().db().Prepare(
+      "SELECT COUNT(*) FROM AgentEntry WHERE Prototype = 'foobar' AND EnterTime='1';"
+      );
+  stmt->Step();
+  EXPECT_EQ(3, stmt->GetInt(0));
 }
 
 TEST_F(DeployInstTests, PositionInitialize) {
