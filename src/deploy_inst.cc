@@ -18,13 +18,13 @@ void DeployInst::Build(cyclus::Agent* parent) {
 
     std::stringstream ss;
     ss << proto;
-    // either decomnotif can be editted or we can always adjust the lifetimes 
+    
     if (lifetimes.size() == prototypes.size()) {
       cyclus::Agent* a = context()->CreateAgent<Agent>(proto);
       if (a->lifetime() != lifetimes[i]) {
         a->lifetime(lifetimes[i]);
 
-        if (lifetimes[i] == -1 ) {
+        if (lifetimes[i] == -1) {
           ss << "_life_forever";
         } else {
           ss << "_life_" << lifetimes[i];
@@ -56,7 +56,7 @@ void DeployInst::Build(cyclus::Agent* parent) {
       }
     }
     for (int j = 0; j < n_build[i]; j++) {
-        context()->SchedBuild(this, proto, t_build);
+      context()->SchedBuild(this, proto, t_build);
     }
   }
 }
