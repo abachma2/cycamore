@@ -86,10 +86,10 @@ class DeployInst :
 
   #pragma cyclus var { \
     "doc": "Year to start deploying prototypes (same order).", \
-    "default": [], \
+    "default": 0, \
     "uilabel": "deploy year",\
   }
-  std::vector<int> deployyear;
+  int deployyear;
 
   #pragma cyclus var {							\
     "doc": "Lifetimes for each prototype in prototype list (same order)." \
