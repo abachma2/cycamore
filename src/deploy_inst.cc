@@ -40,15 +40,14 @@ void DeployInst::Build(cyclus::Agent* parent) {
     int sim_start = 12*(context()->sim_info().y0) + 
                             context()->sim_info().m0;
     int t_build = build_times[i]; 
-
-    if(deployyear.size() == prototypes.size()) { 
-      if(t_build + deployyear[i]*12 < sim_start){
-          cyclus::Warn<cyclus::VALUE_WARNING>(
-          "Facility deployment before simulation start is under development. Deployment time is reset to simulation start (t = 0).");
-          t_build = 1;
+    if(deployyear > 0){
+      if(t_build + deployyear*12 < sim_start){
+        std::stringstream ss;
+        ss << "Deploy year is before simulation start. Adjust deployment time." ;
+        throw cyclus::ValueError(ss.str());
       }
      else {
-        t_build += deployyear[i]*12 - sim_start;
+        t_build += deployyear*12 - sim_start;
         if(t_build >= context()->sim_info().duration) {
           cyclus::Warn<cyclus::VALUE_WARNING>(
           "Deployment year must be less than simulation duration");
@@ -81,13 +80,7 @@ void DeployInst::EnterNotify() {
        << " lifetimes vals, expected " << n;
     throw cyclus::ValueError(ss.str());
   }
-  else if (deployyear.size() > 0 && deployyear.size() != n) {
-    std::stringstream ss;
-    ss << "prototype '" << prototype() << "' has " << deployyear.size()
-       << " start year vals, expected " << n;
-    throw cyclus::ValueError(ss.str());
-  }
-
+  // maybe the inventory shit goes here? 
 
   InitializePosition();
 }
