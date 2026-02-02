@@ -159,7 +159,7 @@ TEST_F(DeployInstTests, DeployYear) {
      "<prototypes>  <val>foobar</val> </prototypes>"
      "<build_times> <val>2</val>      </build_times>"
      "<n_build>     <val>3</val>      </n_build>"
-     "<deployyear>  <val>2012</val>      </deployyear>"
+     "<deployyear>     2012           </deployyear>"
      ;
 
   int simdur = 30;
@@ -179,7 +179,7 @@ TEST_F(DeployInstTests, DeployYear2) {
      "<prototypes>  <val>foobar</val> </prototypes>"
      "<build_times> <val>2</val>      </build_times>"
      "<n_build>     <val>3</val>      </n_build>"
-     "<deployyear>  <val>2009</val>      </deployyear>"
+     "<deployyear>    2015            </deployyear>"
      ;
 
   int simdur = 5;
@@ -188,10 +188,10 @@ TEST_F(DeployInstTests, DeployYear2) {
   int id = sim.Run();
 
   cyclus::SqlStatement::Ptr stmt = sim.db().db().Prepare(
-      "SELECT COUNT(*) FROM AgentEntry WHERE Prototype = 'foobar' AND EnterTime='1';"
+      "SELECT COUNT(*) FROM AgentEntry WHERE Prototype = 'foobar';"
       );
   stmt->Step();
-  EXPECT_EQ(3, stmt->GetInt(0));
+  EXPECT_EQ(0, stmt->GetInt(0));
 }
 
 TEST_F(DeployInstTests, PositionInitialize) {
