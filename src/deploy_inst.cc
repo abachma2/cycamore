@@ -80,8 +80,6 @@ void DeployInst::EnterNotify() {
        << " lifetimes vals, expected " << n;
     throw cyclus::ValueError(ss.str());
   }
-  // maybe the inventory shit goes here? 
-
   InitializePosition();
 }
 
