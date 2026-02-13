@@ -1,6 +1,6 @@
 #include "deploy_inst_tests.h"
-#include "deploy_inst.h"
 #include "error.h"
+#include "deploy_inst.h"
 // make sure that the deployed agent's prototype name is identical to the
 // originally specified prototype name - this is important to test because
 // DeployInst does some mucking around with registering name-modded prototypes
