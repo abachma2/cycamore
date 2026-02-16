@@ -209,6 +209,22 @@ TEST_F(DeployInstTests, DeployYear3) {
   EXPECT_THROW(sim.Run(),cyclus::ValueError); 
 }
 
+TEST_F(DeployInstTests, DeployYear4) {
+  std::string config =
+     "<prototypes>  <val>foobar</val> </prototypes>"
+     "<build_times> <val>2</val>      </build_times>"
+     "<n_build>     <val>3</val>      </n_build>"
+     "<deployyear>    2030          </deployyear>"
+     ;
+
+  int simdur = 5;
+  cyclus::MockSim sim(cyclus::AgentSpec(":cycamore:DeployInst"), config, simdur);
+  cyclus::warn_as_error = true;
+  EXPECT_THROW(sim.Run(),
+               cyclus::ValueError);
+  cyclus::warn_as_error = false;
+}
+
 TEST_F(DeployInstTests, PositionInitialize) {
   std::string config =
      "<prototypes>  <val>foobar</val> </prototypes>"
