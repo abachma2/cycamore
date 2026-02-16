@@ -13,6 +13,14 @@ void DeployInst::Build(cyclus::Agent* parent) {
   cyclus::Institution::Build(parent);
   BuildSched::iterator it;
   std::set<std::string> protos;
+
+  int sim_start = 12*(context()->sim_info().y0) + 
+                            context()->sim_info().m0;
+  int d_t = 0;
+  if(deployyear!=-1){
+    d_t += deployyear*12 - sim_start;
+  }
+
   for (int i = 0; i < prototypes.size(); i++) {
     std::string proto = prototypes[i];
 
@@ -37,23 +45,18 @@ void DeployInst::Build(cyclus::Agent* parent) {
       }
     }
 
-    int sim_start = 12*(context()->sim_info().y0) + 
-                            context()->sim_info().m0;
-    int t_build = build_times[i]; 
-    if(deployyear > 0){
-      if(t_build + deployyear*12 < sim_start){
-        std::stringstream ss;
-        ss << "Deploy year is before simulation start. Adjust deployment time." ;
-        throw cyclus::ValueError(ss.str());
-      }
-     else {
-        t_build += deployyear*12 - sim_start;
-        if(t_build >= context()->sim_info().duration) {
-          cyclus::Warn<cyclus::VALUE_WARNING>(
-          "Deployment year must be less than simulation duration");
-        }
-      }
+    int t_build = build_times[i] + d_t;
+
+    if(t_build < 0){
+      std::stringstream ss;
+      ss << "Deploy year is before simulation start. Adjust deployment time." ;
+      throw cyclus::ValueError(ss.str());
     }
+    else if(t_build >= context()->sim_info().duration){
+      cyclus::Warn<cyclus::VALUE_WARNING>(
+      "Deployment year must be less than simulation duration");
+    }
+
     for (int j = 0; j < n_build[i]; j++) {
       context()->SchedBuild(this, proto, t_build);
     }

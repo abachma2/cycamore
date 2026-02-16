@@ -86,7 +86,7 @@ class DeployInst :
 
   #pragma cyclus var { \
     "doc": "Year to start deploying prototypes.", \
-    "default": 0, \
+    "default": -1, \
     "uilabel": "deploy year",\
   }
   int deployyear;
