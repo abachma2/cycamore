@@ -15,7 +15,6 @@ Since last release
 * Added support for Ubuntu 24.04 (#633)
 * Added (negative)binomial distributions for disruption modeling to storage (#635)
 * Added new variable to Deploy Institution to shift the deployment times (#677)
-* Added new tests for Deploy Institution year (#677)
 
 **Changed:**
 * Cleaned up manual definitions of Position in favor of code injection (#641)
