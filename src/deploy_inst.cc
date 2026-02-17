@@ -54,7 +54,8 @@ void DeployInst::Build(cyclus::Agent* parent) {
     }
     else if(t_build >= context()->sim_info().duration){
       cyclus::Warn<cyclus::VALUE_WARNING>(
-      "Deployment year must be less than simulation duration");
+      "Deployment year must be less than simulation duration;"
+      "A facility will not be deployed during the simulation.");
     }
 
     for (int j = 0; j < n_build[i]; j++) {

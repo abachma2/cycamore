@@ -154,7 +154,7 @@ TEST_F(DeployInstTests, NoDupProtos) {
   stmt->Step();
   EXPECT_EQ(1, stmt->GetInt(0));
 }
-//this test makes sure that the institutions deployed before sim start are reset to 1. 
+
 TEST_F(DeployInstTests, DeployYear) {
   std::string config =
      "<prototypes>  <val>foobar</val> </prototypes>"
@@ -164,38 +164,19 @@ TEST_F(DeployInstTests, DeployYear) {
      ;
 
   int simdur = 30;
+  //MockSim starts in 2010 by default
   cyclus::MockSim sim(cyclus::AgentSpec(":cycamore:DeployInst"), config, simdur);
   sim.DummyProto("foobar");
   int id = sim.Run();
-
+  // 2 years and 2 months after MockSim start is 25 time steps 
   cyclus::SqlStatement::Ptr stmt = sim.db().db().Prepare(
       "SELECT COUNT(*) FROM AgentEntry WHERE Prototype = 'foobar' AND EnterTime = '25';"
       );
   stmt->Step();
-  EXPECT_EQ(3, stmt->GetInt(0)); //start year is 2010
+  EXPECT_EQ(3, stmt->GetInt(0)); 
 }
 
-TEST_F(DeployInstTests, DeployYear2) {
-  std::string config =
-     "<prototypes>  <val>foobar</val> </prototypes>"
-     "<build_times> <val>2</val>      </build_times>"
-     "<n_build>     <val>3</val>      </n_build>"
-     "<deployyear>    2015            </deployyear>"
-     ;
-
-  int simdur = 5;
-  cyclus::MockSim sim(cyclus::AgentSpec(":cycamore:DeployInst"), config, simdur);
-  sim.DummyProto("foobar");
-  int id = sim.Run();
-
-  cyclus::SqlStatement::Ptr stmt = sim.db().db().Prepare(
-      "SELECT COUNT(*) FROM AgentEntry WHERE Prototype = 'foobar';"
-      );
-  stmt->Step();
-  EXPECT_EQ(0, stmt->GetInt(0));
-}
-
-TEST_F(DeployInstTests, DeployYear3) {
+TEST_F(DeployInstTests, DeployYearEarlyError) {
   std::string config =
      "<prototypes>  <val>foobar</val> </prototypes>"
      "<build_times> <val>2</val>      </build_times>"
@@ -209,7 +190,7 @@ TEST_F(DeployInstTests, DeployYear3) {
   EXPECT_THROW(sim.Run(),cyclus::ValueError); 
 }
 
-TEST_F(DeployInstTests, DeployYear4) {
+TEST_F(DeployInstTests, DeployYearLateWarn) {
   std::string config =
      "<prototypes>  <val>foobar</val> </prototypes>"
      "<build_times> <val>2</val>      </build_times>"
@@ -219,10 +200,18 @@ TEST_F(DeployInstTests, DeployYear4) {
 
   int simdur = 5;
   cyclus::MockSim sim(cyclus::AgentSpec(":cycamore:DeployInst"), config, simdur);
+
   cyclus::warn_as_error = true;
   EXPECT_THROW(sim.Run(),
                cyclus::ValueError);
   cyclus::warn_as_error = false;
+
+  int id = sim.Run();
+  cyclus::SqlStatement::Ptr stmt = sim.db().db().Prepare(
+      "SELECT COUNT(*) FROM AgentEntry WHERE Prototype = 'foobar';"
+      );
+  stmt->Step();
+  EXPECT_EQ(0, stmt->GetInt(0));
 }
 
 TEST_F(DeployInstTests, PositionInitialize) {
