@@ -84,6 +84,12 @@ class DeployInst :
   }
   std::vector<int> n_build;
 
+  #pragma cyclus var { \
+    "doc": "Year to start deploying prototypes.", \
+    "default": -1, \
+    "uilabel": "deploy year",\
+  }
+  int deployyear;
 
   #pragma cyclus var {							\
     "doc": "Lifetimes for each prototype in prototype list (same order)." \
