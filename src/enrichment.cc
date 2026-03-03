@@ -44,6 +44,34 @@ std::string Enrichment::str() {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Enrichment::Build(cyclus::Agent* parent) {
   Facility::Build(parent);
+
+  std::vector<string> enrich_commods = {feed_commod, product_commod, tails_commod}
+  for (std::<vector>::iterator inv_name = initial_inventory.begin();
+        inv_name != initial_inventory.end();
+        inv_name++){
+          switch (day) {
+            case feed_commod:
+              inventory.Push(Material::Create(this, initial_feed,
+                                    context()->GetRecipe(feed_recipe)));
+              break;
+            case product_commod:
+              inventory.Push(Material::Create(this, initial_feed,
+                                    context()->GetRecipe(product_recipe)));
+              break;
+            case tails_commod:
+              inventory.Push(Material::Create(this, initial_feed,
+                                    context()->GetRecipe(tails_r)));
+              break; 
+
+          // auto it = std::find(enrich_commods.begin(),enrich_commods.end(),inv_name)
+          // int index = std::distance(enrich_commods.begin(),it)
+          // if(index > ) 
+        }
+  if(initial_inventory.size() > 0){
+
+
+  }
+
   if (initial_feed > 0) {
     inventory.Push(Material::Create(this, initial_feed,
                                     context()->GetRecipe(feed_recipe)));
