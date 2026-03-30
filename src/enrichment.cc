@@ -45,38 +45,30 @@ std::string Enrichment::str() {
 void Enrichment::Build(cyclus::Agent* parent) {
   Facility::Build(parent);
 
-  std::vector<string> enrich_commods = {feed_commod, product_commod, tails_commod}
-  for (std::<vector>::iterator inv_name = initial_inventory.begin();
+  if (initial_inventory.size() != initial_quantities.size()) {
+      cyclus::Error("Number of initial inventory quantities must match the number of initial quantities");
+            }
+  for (std::<vector>::iterator inv_name = initial_inventory_amt.begin();
         inv_name != initial_inventory.end();
         inv_name++){
-          switch (day) {
+          switch (inv_name) {
             case feed_commod:
               inventory.Push(Material::Create(this, initial_feed,
                                     context()->GetRecipe(feed_recipe)));
               break;
             case product_commod:
-              inventory.Push(Material::Create(this, initial_feed,
-                                    context()->GetRecipe(product_recipe)));
+              cyclus::Error("Product commodity cannot have initial inventory as bespoke 
+                enrichment is defined upon demand.");
               break;
             case tails_commod:
-              inventory.Push(Material::Create(this, initial_feed,
-                                    context()->GetRecipe(tails_r)));
+              Composition::Ptr blank_comp = Composition::CreateFromMass(CompMap())
+              tails.Push(Material::Create(this, initial_feed,
+                                    blank_comp));
               break; 
-
-          // auto it = std::find(enrich_commods.begin(),enrich_commods.end(),inv_name)
-          // int index = std::distance(enrich_commods.begin(),it)
-          // if(index > ) 
-        }
-  if(initial_inventory.size() > 0){
-
-
-  }
-
-  if (initial_feed > 0) {
-    inventory.Push(Material::Create(this, initial_feed,
-                                    context()->GetRecipe(feed_recipe)));
-  }
-
+            default: 
+              cyclus::Error(inv_name << "is not associated with any commodity");
+              }
+            }
   LOG(cyclus::LEV_DEBUG2, "EnrFac") << "Enrichment "
                                     << " entering the simuluation: ";
   LOG(cyclus::LEV_DEBUG2, "EnrFac") << str();
