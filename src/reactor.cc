@@ -65,6 +65,8 @@ void Reactor::EnterNotify() {
   core.keep_packaging(keep_packaging);
   spent.keep_packaging(keep_packaging);
 
+  InitializeMaterials();
+
   // If the user ommitted fuel_prefs, we set it to zeros for each fuel
   // type.  Without this segfaults could occur - yuck.
   if (fuel_prefs.size() == 0) {
@@ -444,6 +446,62 @@ bool Reactor::Discharge() {
   }
 
   return true;
+}
+
+void Reactor::InitializeMaterials() {
+
+  // initialize core
+  for(int i = 0; i<initial_fresh.size(); i++){
+    InitialRecipes(initial_fresh, fuel_inrecipes)
+    int initial_assem = std::floor(initial_fresh_amt[i]/assem_size); 
+    int rmd_space = n_assem_fresh - fresh.count();
+    if (initial_assem > rmd_space) {
+      throw cyclus::Error<VALUE_WARNING>("Mass exceeds the capacity of fresh fuel inventory. Inventory will be partially filled.");
+          initial_assem = rmd_space;
+          }
+    else  {
+      for(int assem = 0; assem<initial_assem.size(), assem++) {
+          cyclus::Composition::Ptr recipe = context()->GetRecipe(initial_fresh[i]);
+          m = Material::Create(this, assem_size, recipe);
+          fresh.push(m);
+        }
+      }
+    }
+
+  //initialize fresh inv
+  for(int i = 0; i<initial_core.size(); i++){
+    InitialRecipes(initial_core, fuel_inrecipes)
+    int initial_assem = std::floor(initial_core_amt[i]/assem_size);
+    int rmd_space = n_assem_fresh - core.count();
+    if (initial_assem > rmd_space) {
+      throw cyclus::Error<VALUE_WARNING>("Mass exceeds the capacity of core. Inventory will be partially filled.");
+          initial_assem = rmd_space;
+          }
+    else  {
+      for(int assem = 0; assem<initial_assem.size(), assem++) {
+          cyclus::Composition::Ptr recipe = context()->GetRecipe(initial_core[i]);
+          m = Material::Create(this, assem_size, recipe);
+          core.push(m);
+        }
+      }
+    }
+
+  //intialize spent fuel inv
+  for (int i = 0; i<initial_spent.size(); i++)  {
+    InitialRecipes(initial_spent, fuel_outrecipes)
+    cyclus::Composition::Ptr recipe = context()->GetRecipe(initial_spent[i]);
+    m = Material::Create(this, initial_spent_amt[i] recipe) 
+    spent.push(m)
+    // check if exceeds the resource buffer
+    }
+  }
+
+
+void Reactor::InitialRecipes(std::vector<std::string> int_invs, std::vector<std::string> recipes){
+  for (int i = 0; i<int_invs.size(); i++) {
+    if (std::find(recipes.begin(), recipes.end(), int_invs[i]) = recipes.end());
+    throw KeyError("Recipe not associated with an in-commodity or out-commodity");
+  }
 }
 
 void Reactor::Load() {

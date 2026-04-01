@@ -45,28 +45,30 @@ std::string Enrichment::str() {
 void Enrichment::Build(cyclus::Agent* parent) {
   Facility::Build(parent);
 
-  if (initial_inventory.size() != initial_quantities.size()) {
-      cyclus::Error("Number of initial inventory quantities must match the number of initial quantities");
+  if (initial_inventory.size() != initial_inventory_amt.size()) {
+      throw cyclus::Error("Number of initial inventory quantities must match the number of initial quantities");
             }
-  for (std::<vector>::iterator inv_name = initial_inventory_amt.begin();
-        inv_name != initial_inventory.end();
-        inv_name++){
-          switch (inv_name) {
-            case feed_commod:
-              inventory.Push(Material::Create(this, initial_feed,
+
+  for (int i = 0; i<initial_inventory.size(); i++){
+        std::cout << initial_inventory[i];
+        if (initial_inventory[i] ==  feed_commod) {
+              std::cout<< "Feed";
+              inventory.Push(Material::Create(this, initial_inventory_amt[i],
                                     context()->GetRecipe(feed_recipe)));
-              break;
-            case product_commod:
-              cyclus::Error("Product commodity cannot have initial inventory as bespoke 
-                enrichment is defined upon demand.");
-              break;
-            case tails_commod:
-              Composition::Ptr blank_comp = Composition::CreateFromMass(CompMap())
-              tails.Push(Material::Create(this, initial_feed,
+              }
+        else if (initial_inventory[i] == product_commod) {
+                std::cout<< "product";
+              throw cyclus::Error("Product commodity cannot have initial inventory as bespoke enrichment is defined upon demand.");
+              }
+        else if (initial_inventory[i] == tails_commod){
+              std::cout<< "tails";
+              cyclus::Composition::Ptr blank_comp = cyclus::Composition::CreateFromMass(cyclus::CompMap());
+              tails.Push(Material::Create(this, initial_inventory_amt[i],
                                     blank_comp));
-              break; 
-            default: 
-              cyclus::Error(inv_name << "is not associated with any commodity");
+              } 
+        else { 
+              std::cout<< "nothing";
+              throw cyclus::Error(initial_inventory[i] + " is not associated with any commodity");
               }
             }
   LOG(cyclus::LEV_DEBUG2, "EnrFac") << "Enrichment "

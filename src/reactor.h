@@ -183,6 +183,10 @@ class Reactor : public cyclus::Facility,
   /// from the spent fuel buffer.
   std::map<std::string, cyclus::toolkit::MatVec> PeekSpent();
 
+  void InitializeMaterials();
+
+  void InitialRecipes();
+
   /////// fuel specifications /////////
   #pragma cyclus var { \
     "uitype": ["oneormore", "incommodity"], \
@@ -314,6 +318,56 @@ class Reactor : public cyclus::Facility,
            " reactor operation stalls.", \
   }
   int n_assem_spent;
+
+     ///////// initial inventory ///////////
+  #pragma cyclus var { \
+  "default": [], \
+  "uilabel": "Recipe names for initial core inventory", \
+  "doc": "Specify an in-commodity recipe name that should have" \
+          "an initial inventory. This material will be added to the core as an assembly.", \
+  }
+  std::vector<std::string> initial_core;
+
+  #pragma cyclus var { \
+  "default": [], \
+  "uilabel": "Mass amounts for initial core inventory", \
+  "doc": "Specify an amount associated with an in-commidity recipe" \
+          "Same order as initial core recipes.", \
+  }
+  std::vector<double> initial_core_amt;
+
+  #pragma cyclus var { \
+  "default": [], \
+  "uilabel": "Recipe names for initial fresh fuel", \
+  "doc": "Specify an in-commodity recipe name that should have" \
+          "an initial inventory. This material will be added to the on-hand fresh fuel inventory as an assembly.", \
+  }
+  std::vector<std::string> initial_fresh;
+
+  #pragma cyclus var { \
+  "default": [], \
+  "uilabel": "Mass amounts for initial fresh fuel inventory", \
+  "doc": "Specify an amount associated with an in-commidity recipe" \
+          "Same order as initial fresh recipes.", \
+  }
+  std::vector<double> initial_fresh_amt;
+
+  #pragma cyclus var { \
+  "default": [], \
+  "uilabel": "Recipe names for initial spent fuel inventory", \
+  "doc": "Specify an out-commodity recipe name that should have" \
+          "an initial inventory. This material will be added to the on-site spent fuel as a --.", \
+  }
+  std::vector<std::string> initial_spent;
+
+  #pragma cyclus var { \
+  "default": [], \
+  "uilabel": "Mass amounts for initial spent fuel inventory", \
+  "doc": "Specify an amount associated with an out-commidity recipe" \
+          "Same order as initial spent recipes.", \
+  }
+  std::vector<double> initial_spent_amt;
+  
 
    ///////// cycle params ///////////
   #pragma cyclus var { \

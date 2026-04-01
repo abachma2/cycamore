@@ -338,13 +338,13 @@ class Enrichment
   double max_feed_inventory;
 
   #pragma cyclus var  {							\
-    "default": [], "Commodity with an initial inventory (tails, feed, enriched product)",		\
+    "default": [],		\
     "uilabel": "Initial commodity inventory",				\
   }
-  std::vector<string> initial_inventory;
+  std::vector<std::string> initial_inventory;
 
   #pragma cyclus var  {							\
-    "default": [], "Quantity of commodity with an initial inventory (tails, feed, enriched product)",		\
+    "default": [],\
     "uilabel": "Initial amount of commodity inventory",				\
   }
   std::vector<double> initial_inventory_amt;
