@@ -65,8 +65,6 @@ void Reactor::EnterNotify() {
   core.keep_packaging(keep_packaging);
   spent.keep_packaging(keep_packaging);
 
-  //InitializeMaterials();
-
   // If the user ommitted fuel_prefs, we set it to zeros for each fuel
   // type.  Without this segfaults could occur - yuck.
   if (fuel_prefs.size() == 0) {
