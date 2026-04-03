@@ -50,27 +50,23 @@ void Enrichment::Build(cyclus::Agent* parent) {
             }
 
   for (int i = 0; i<initial_inventory.size(); i++){
-        std::cout << initial_inventory[i];
         if (initial_inventory[i] ==  feed_commod) {
-              std::cout<< "Feed";
               inventory.Push(Material::Create(this, initial_inventory_amt[i],
                                     context()->GetRecipe(feed_recipe)));
               }
         else if (initial_inventory[i] == product_commod) {
-                std::cout<< "product";
               throw cyclus::Error("Product commodity cannot have initial inventory as bespoke enrichment is defined upon demand.");
               }
         else if (initial_inventory[i] == tails_commod){
-              std::cout<< "tails";
               cyclus::Composition::Ptr blank_comp = cyclus::Composition::CreateFromMass(cyclus::CompMap());
               tails.Push(Material::Create(this, initial_inventory_amt[i],
                                     blank_comp));
               } 
         else { 
-              std::cout<< "nothing";
               throw cyclus::Error(initial_inventory[i] + " is not associated with any commodity");
               }
             }
+
   LOG(cyclus::LEV_DEBUG2, "EnrFac") << "Enrichment "
                                     << " entering the simuluation: ";
   LOG(cyclus::LEV_DEBUG2, "EnrFac") << str();

@@ -116,6 +116,7 @@ class Reactor : public cyclus::Facility,
   virtual void Tock();
   virtual void EnterNotify();
   virtual bool CheckDecommissionCondition();
+  virtual void Build(cyclus::Agent* parent);
 
   virtual void AcceptMatlTrades(const std::vector<std::pair<
       cyclus::Trade<cyclus::Material>, cyclus::Material::Ptr> >& responses);
@@ -185,7 +186,7 @@ class Reactor : public cyclus::Facility,
 
   void InitializeMaterials();
 
-  void InitialRecipes();
+  void InitialRecipes(std::vector<std::string>, std::vector<std::string>);
 
   /////// fuel specifications /////////
   #pragma cyclus var { \
