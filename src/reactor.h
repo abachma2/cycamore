@@ -331,11 +331,11 @@ class Reactor : public cyclus::Facility,
 
   #pragma cyclus var { \
   "default": [], \
-  "uilabel": "Mass amounts for initial core inventory", \
+  "uilabel": "Number of assemblies for initial core inventory", \
   "doc": "Specify an amount associated with an in-commidity recipe" \
           "Same order as initial core recipes.", \
   }
-  std::vector<double> initial_core_amt;
+  std::vector<int> initial_core_amt;
 
   #pragma cyclus var { \
   "default": [], \
@@ -347,11 +347,11 @@ class Reactor : public cyclus::Facility,
 
   #pragma cyclus var { \
   "default": [], \
-  "uilabel": "Mass amounts for initial fresh fuel inventory", \
+  "uilabel": "Number of assemblies for initial fresh fuel inventory", \
   "doc": "Specify an amount associated with an in-commidity recipe" \
           "Same order as initial fresh recipes.", \
   }
-  std::vector<double> initial_fresh_amt;
+  std::vector<int> initial_fresh_amt;
 
   #pragma cyclus var { \
   "default": [], \

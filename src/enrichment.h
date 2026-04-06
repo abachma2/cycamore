@@ -328,6 +328,23 @@ class Enrichment
   double initial_feed;
 
   #pragma cyclus var {							\
+    "default": 0, "tooltip": "initial tails (kg)",		\
+    "uilabel": "Initial tails Inventory",				\
+    "doc": "amount of tails stored at the enrichment "	\
+    "facility at the beginning of the simulation (kg) (based on recipe)"			\
+  }
+  double initial_tails;
+
+  #pragma cyclus var { \
+    "default": "", \
+    "tooltip": "initial tails recipe",						\
+    "doc": "recipe for enrichment facility tails commodity",		\
+    "uilabel": "Initial tails recipe",                                   \
+    "uitype": "outrecipe" \
+  }
+  std::string initial_tails_recipe;
+
+  #pragma cyclus var {							\
     "default": CY_LARGE_DOUBLE, "tooltip": "max inventory of feed material (kg)", \
     "uilabel": "Maximum Feed Inventory", \
     "uitype": "range", \
@@ -336,18 +353,6 @@ class Enrichment
            "the enrichment facility (kg)"     \
   }
   double max_feed_inventory;
-
-  #pragma cyclus var  {							\
-    "default": [],		\
-    "uilabel": "Initial commodity inventory",				\
-  }
-  std::vector<std::string> initial_inventory;
-
-  #pragma cyclus var  {							\
-    "default": [],\
-    "uilabel": "Initial amount of commodity inventory",				\
-  }
-  std::vector<double> initial_inventory_amt;
 
   #pragma cyclus var { \
     "default": 1.0,						\

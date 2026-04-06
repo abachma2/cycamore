@@ -45,27 +45,18 @@ std::string Enrichment::str() {
 void Enrichment::Build(cyclus::Agent* parent) {
   Facility::Build(parent);
 
-  if (initial_inventory.size() != initial_inventory_amt.size()) {
-      throw cyclus::Error("Number of initial inventory quantities must match the number of initial quantities");
-            }
-
-  for (int i = 0; i<initial_inventory.size(); i++){
-        if (initial_inventory[i] ==  feed_commod) {
-              inventory.Push(Material::Create(this, initial_inventory_amt[i],
+  if (initial_feed > 0) {
+    inventory.Push(Material::Create(this, initial_feed,
                                     context()->GetRecipe(feed_recipe)));
-              }
-        else if (initial_inventory[i] == product_commod) {
-              throw cyclus::Error("Product commodity cannot have initial inventory as bespoke enrichment is defined upon demand.");
-              }
-        else if (initial_inventory[i] == tails_commod){
-              cyclus::Composition::Ptr blank_comp = cyclus::Composition::CreateFromMass(cyclus::CompMap());
-              tails.Push(Material::Create(this, initial_inventory_amt[i],
-                                    blank_comp));
-              } 
-        else { 
-              throw cyclus::Error(initial_inventory[i] + " is not associated with any commodity");
-              }
-            }
+  }
+
+  if (initial_tails > 0) {
+    if (initial_tails_recipe == ""){
+      throw cyclus::KeyError("Recipe for initial tails inventory must be defined.");;
+    }
+    tails.Push(Material::Create(this, initial_feed,
+                                    context()->GetRecipe(initial_tails_recipe)));
+  }
 
   LOG(cyclus::LEV_DEBUG2, "EnrFac") << "Enrichment "
                                     << " entering the simuluation: ";

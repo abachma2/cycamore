@@ -455,14 +455,13 @@ void Reactor::InitializeMaterials() {
   // initialize fresh inv
   for(int i = 0; i<initial_fresh.size(); i++){
     InitialRecipes(initial_fresh, fuel_inrecipes);
-    int initial_assem = static_cast<int>(std::floor(initial_fresh_amt[i]/assem_size)); 
     int rmd_space = n_assem_fresh - fresh.count();
-    if (initial_assem > rmd_space) {
+    if (initial_fresh_amt[i] > rmd_space) {
       cyclus::Warn<cyclus::VALUE_WARNING>("Mass exceeds the capacity of fresh fuel inventory. Inventory will be partially filled.");
-      initial_assem = rmd_space;
+      initial_fresh_amt[i] = rmd_space;
       }
     else  {
-      for(int assem = 0; assem<initial_assem; assem++) {
+      for(int assem = 0; assem<initial_fresh_amt[i]; assem++) {
           cyclus::Composition::Ptr recipe = context()->GetRecipe(initial_fresh[i]);
           Material::Ptr m = Material::Create(this, assem_size, recipe);
           fresh.Push(m);
@@ -473,14 +472,13 @@ void Reactor::InitializeMaterials() {
   //initialize core inv
   for(int i = 0; i<initial_core.size(); i++){
     InitialRecipes(initial_core, fuel_inrecipes);
-    int initial_assem = static_cast<int>(std::floor(initial_core_amt[i]/assem_size)); 
     int rmd_space = n_assem_core - core.count();
-    if (initial_assem > rmd_space) {
+    if (initial_core_amt[i] > rmd_space) {
       cyclus::Warn<cyclus::VALUE_WARNING>("Mass exceeds the capacity of core. Inventory will be partially filled.");
-      initial_assem = rmd_space;
+      initial_core_amt[i] = rmd_space;
       }
     else  {
-      for(int assem = 0; assem<initial_assem; assem++) {
+      for(int assem = 0; assem<initial_core_amt[i]; assem++) {
           cyclus::Composition::Ptr recipe = context()->GetRecipe(initial_core[i]);
           Material::Ptr m = Material::Create(this, assem_size, recipe);
           core.Push(m);
