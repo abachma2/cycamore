@@ -108,13 +108,29 @@ void Reactor::EnterNotify() {
   if (ss.str().size() > 0) {
     throw ValueError(ss.str());
   }
+
+  InitialRecipes(initial_fresh_recipes, fuel_inrecipes);
+  InitialRecipes(initial_core_recipes, fuel_inrecipes);
+  InitialRecipes(initial_spent_recipes, fuel_outrecipes);
+
+  if (initial_core_recipes.size() != initial_core_amt.size()) {
+      throw ValueError("Number of entries for initial core recipes must match the number of entries for initial core amount.");
+    }
+  if (initial_fresh_recipes.size() != initial_fresh_amt.size()) {
+      throw ValueError("Number of entries for initial core recipes must match the number of entries for initial core amount.");
+    }
+  if (initial_spent_recipes.size() != initial_spent_amt.size()) {
+      throw ValueError("Number of entries for initial core recipes must match the number of entries for initial core amount.");
+    }
   
   InitializePosition();
 }
 
 void Reactor::Build(cyclus::Agent* parent) {
   Facility::Build(parent);
-  InitializeMaterials();
+  LoadInitial(initial_fresh_recipes,initial_fresh_amt, fresh);
+  LoadInitial(initial_core_recipes,initial_core_amt, core);
+  LoadInitial(initial_spent_recipes,initial_spent_amt, spent);
 }
 
 bool Reactor::CheckDecommissionCondition() {
@@ -450,57 +466,33 @@ bool Reactor::Discharge() {
   return true;
 }
 
-void Reactor::InitializeMaterials() {
-
-  // initialize fresh inv
-  for(int i = 0; i<initial_fresh.size(); i++){
-    InitialRecipes(initial_fresh, fuel_inrecipes);
-    int rmd_space = n_assem_fresh - fresh.count();
-    if (initial_fresh_amt[i] > rmd_space) {
-      cyclus::Warn<cyclus::VALUE_WARNING>("Mass exceeds the capacity of fresh fuel inventory. Inventory will be partially filled.");
-      initial_fresh_amt[i] = rmd_space;
-      }
-    else  {
-      for(int assem = 0; assem<initial_fresh_amt[i]; assem++) {
-          cyclus::Composition::Ptr recipe = context()->GetRecipe(initial_fresh[i]);
-          Material::Ptr m = Material::Create(this, assem_size, recipe);
-          fresh.Push(m);
+// make sure that the 
+void Reactor::LoadInitial(std::vector<std::string>& initial_recipes,
+                     std::vector<int>& initial_amts, 
+                     cyclus::toolkit::ResBuf<cyclus::Material>& buffer) {
+  int idx = 0;
+  int avail = int(buffer.space()/assem_size);
+  while (idx < initial_recipes.size() && avail > 0) {
+    int n_init_assems = std::min(initial_amts[idx], avail);
+    if (n_init_assems < initial_amts[idx]) {
+      std::stringstream ss;
+      ss << "Number of " << initial_recipes[idx] << " assemblies has exceeded the inventory capacity. " 
+        << "Not all initial inventory will be filled.";
+      cyclus::Warn<cyclus::VALUE_WARNING>(ss.str());
+    }
+    cyclus::Composition::Ptr recipe = context()->GetRecipe(initial_recipes[idx]);
+    for (int assem = 0; assem < n_init_assems; assem++) {
+       buffer.Push(Material::Create(this, assem_size, recipe));
         }
-      }
-    }
-
-  //initialize core inv
-  for(int i = 0; i<initial_core.size(); i++){
-    InitialRecipes(initial_core, fuel_inrecipes);
-    int rmd_space = n_assem_core - core.count();
-    if (initial_core_amt[i] > rmd_space) {
-      cyclus::Warn<cyclus::VALUE_WARNING>("Mass exceeds the capacity of core. Inventory will be partially filled.");
-      initial_core_amt[i] = rmd_space;
-      }
-    else  {
-      for(int assem = 0; assem<initial_core_amt[i]; assem++) {
-          cyclus::Composition::Ptr recipe = context()->GetRecipe(initial_core[i]);
-          Material::Ptr m = Material::Create(this, assem_size, recipe);
-          core.Push(m);
-        }
-      }
-    }
-
-  //intialize spent fuel inv
-  for (int i = 0; i<initial_spent.size(); i++)  {
-    InitialRecipes(initial_spent, fuel_outrecipes);
-    cyclus::Composition::Ptr recipe = context()->GetRecipe(initial_spent[i]);
-    Material::Ptr m = Material::Create(this, initial_spent_amt[i], recipe);
-    spent.Push(m);
-    cyclus::toolkit::RecordTimeSeries<double>("supply"+initial_spent[i], this, initial_spent_amt[i]);
-    }
+    avail -= n_init_assems;
+    idx++;
   }
+}
 
 
 void Reactor::InitialRecipes(std::vector<std::string> int_invs, std::vector<std::string> recipes){
   for (int i = 0; i<int_invs.size(); i++) {
-    if (std::find(recipes.begin(), recipes.end(), int_invs[i]) != recipes.end()) {}
-    else {
+    if (std::find(recipes.begin(), recipes.end(), int_invs[i]) == recipes.end()) {
     throw KeyError("Recipe not associated with an in-commodity or out-commodity");
     }
   }

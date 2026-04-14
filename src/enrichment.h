@@ -335,15 +335,6 @@ class Enrichment
   }
   double initial_tails;
 
-  #pragma cyclus var { \
-    "default": "", \
-    "tooltip": "initial tails recipe",						\
-    "doc": "recipe for enrichment facility tails commodity",		\
-    "uilabel": "Initial tails recipe",                                   \
-    "uitype": "outrecipe" \
-  }
-  std::string initial_tails_recipe;
-
   #pragma cyclus var {							\
     "default": CY_LARGE_DOUBLE, "tooltip": "max inventory of feed material (kg)", \
     "uilabel": "Maximum Feed Inventory", \

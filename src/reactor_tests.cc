@@ -333,6 +333,64 @@ TEST(ReactorTests, FullSpentInventoryShutdown) {
 
 }
 
+// tests that that the initial core, fresh fuel, and spent fuel buffers 
+// are filled with the specified number of assemblies and recipes
+TEST(ReactorTests, InitialMaterialInventory) {
+  std::string config =
+    " <fuel_inrecipes> <val>uox</val> </fuel_inrecipes> "
+    " <fuel_outrecipes> <val>spentuox</val> </fuel_outrecipes> "
+    " <fuel_incommods> <val>uox</val> </fuel_incommods> "
+    " <fuel_outcommods> <val>waste</val> </fuel_outcommods> "
+    ""
+    " <cycle_time>1</cycle_time> "
+    " <refuel_time>0</refuel_time> "
+    " <assem_size>8</assem_size> "
+    " <n_assem_core>8</n_assem_core> "
+    " <n_assem_batch>2</n_assem_batch> "
+    " <n_assem_fresh>5</n_assem_fresh> "
+    " <n_assem_spent>3</n_assem_spent> "
+    " <power_cap>100</power_cap> "
+    ""
+    " <initial_core_recipes> <val>uox</val> </initial_core_recipes> "
+    " <initial_fresh_recipes> <val>uox</val> </initial_fresh_recipes> "
+    " <initial_spent_recipes> <val>spentuox</val> </initial_spent_recipes> "
+    " <initial_core_amt> <val>6</val> </initial_core_amt> "
+    " <initial_fresh_amt> <val>6</val> </initial_fresh_amt> "
+    " <initial_spent_amt> <val>2</val> </initial_spent_amt> ";
+
+  int simdur = 0;
+  cyclus::MockSim sim(cyclus::AgentSpec(":cycamore:Reactor"), config, simdur);
+  sim.AddSource("uox").Finalize();
+  sim.AddSink("waste").Finalize();
+  sim.AddRecipe("uox", c_uox());
+  sim.AddRecipe("spentuox", c_spentuox());
+  int id = sim.Run();
+
+
+  std::vector<Cond> conds;
+  QueryResult qr;
+
+  //check the initial inventory of the fresh at timestep 0
+  conds.push_back(Cond("SimTime", "==", 0));
+  conds.push_back(Cond("AgentId","==",id));
+  conds.push_back(Cond("InventoryName","==",std::string("fresh")));
+  qr = sim.db().Query("AgentStateInventories", &conds);
+  EXPECT_EQ(5, qr.rows.size());
+
+  // check the initial inventory of the spent fuel at timestep 0
+  conds[2] = Cond("InventoryName","==",std::string("spent"));
+  qr = sim.db().Query("AgentStateInventories", &conds);
+  EXPECT_EQ(2, qr.rows.size());
+
+  // check the initial inventory of the core at timestep 0
+  conds[2] = Cond("InventoryName","==",std::string("core"));
+  qr = sim.db().Query("AgentStateInventories", &conds);
+  EXPECT_EQ(6, qr.rows.size());
+
+}
+
+
+
 // tests that the reactor cycle is delayed as expected when it is unable to
 // acquire fuel in time for the next cycle start.  This checks that after a
 // cycle is delayed past an original scheduled start time, as soon as enough fuel is

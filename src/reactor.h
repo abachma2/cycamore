@@ -184,7 +184,9 @@ class Reactor : public cyclus::Facility,
   /// from the spent fuel buffer.
   std::map<std::string, cyclus::toolkit::MatVec> PeekSpent();
 
-  void InitializeMaterials();
+  void LoadInitial(std::vector<std::string>& initial_recipes,
+                     std::vector<int>& initial_amts, 
+                     cyclus::toolkit::ResBuf<cyclus::Material>& buffer);
 
   void InitialRecipes(std::vector<std::string>, std::vector<std::string>);
 
@@ -327,7 +329,7 @@ class Reactor : public cyclus::Facility,
   "doc": "Specify an in-commodity recipe name that should have" \
           "an initial inventory. This material will be added to the core as an assembly.", \
   }
-  std::vector<std::string> initial_core;
+  std::vector<std::string> initial_core_recipes;
 
   #pragma cyclus var { \
   "default": [], \
@@ -343,7 +345,7 @@ class Reactor : public cyclus::Facility,
   "doc": "Specify an in-commodity recipe name that should have" \
           "an initial inventory. This material will be added to the on-hand fresh fuel inventory as an assembly.", \
   }
-  std::vector<std::string> initial_fresh;
+  std::vector<std::string> initial_fresh_recipes;
 
   #pragma cyclus var { \
   "default": [], \
@@ -359,7 +361,7 @@ class Reactor : public cyclus::Facility,
   "doc": "Specify an out-commodity recipe name that should have" \
           "an initial inventory. This material will be added to the on-site spent fuel as a --.", \
   }
-  std::vector<std::string> initial_spent;
+  std::vector<std::string> initial_spent_recipes;
 
   #pragma cyclus var { \
   "default": [], \
@@ -367,7 +369,7 @@ class Reactor : public cyclus::Facility,
   "doc": "Specify an amount associated with an out-commidity recipe" \
           "Same order as initial spent recipes.", \
   }
-  std::vector<double> initial_spent_amt;
+  std::vector<int> initial_spent_amt;
   
 
    ///////// cycle params ///////////

@@ -48,15 +48,13 @@ void Enrichment::Build(cyclus::Agent* parent) {
   if (initial_feed > 0) {
     inventory.Push(Material::Create(this, initial_feed,
                                     context()->GetRecipe(feed_recipe)));
-  }
-
-  if (initial_tails > 0) {
-    if (initial_tails_recipe == ""){
-      throw cyclus::KeyError("Recipe for initial tails inventory must be defined.");;
     }
-    tails.Push(Material::Create(this, initial_feed,
-                                    context()->GetRecipe(initial_tails_recipe)));
-  }
+  if (initial_tails > 0) {
+      cyclus::CompMap comp;
+      comp[922350000] = tails_assay;
+      comp[922380000] = 1 - tails_assay;
+      tails.Push(Material::Create(this, initial_tails, cyclus::Composition::CreateFromAtom(comp)));
+    }
 
   LOG(cyclus::LEV_DEBUG2, "EnrFac") << "Enrichment "
                                     << " entering the simuluation: ";
