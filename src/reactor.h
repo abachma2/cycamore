@@ -349,7 +349,7 @@ class Reactor : public cyclus::Facility,
 
   #pragma cyclus var { \
   "default": [], \
-  "uilabel": "Number of assemblies for initial fresh fuel inventory", \
+  "uilabel": " for initial fresh fuel inventory", \
   "doc": "Specify an amount associated with an in-commidity recipe" \
           "Same order as initial fresh recipes.", \
   }
@@ -365,7 +365,7 @@ class Reactor : public cyclus::Facility,
 
   #pragma cyclus var { \
   "default": [], \
-  "uilabel": "Mass amounts for initial spent fuel inventory", \
+  "uilabel": "Number of assemblies for initial spent fuel inventory", \
   "doc": "Specify an amount associated with an out-commidity recipe" \
           "Same order as initial spent recipes.", \
   }

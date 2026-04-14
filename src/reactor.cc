@@ -114,13 +114,13 @@ void Reactor::EnterNotify() {
   InitialRecipes(initial_spent_recipes, fuel_outrecipes);
 
   if (initial_core_recipes.size() != initial_core_amt.size()) {
-      throw ValueError("Number of entries for initial core recipes must match the number of entries for initial core amount.");
+      throw ValueError("Number of entries for initial core recipes must match the number of entries for initial core assemblies.");
     }
   if (initial_fresh_recipes.size() != initial_fresh_amt.size()) {
-      throw ValueError("Number of entries for initial core recipes must match the number of entries for initial core amount.");
+      throw ValueError("Number of entries for initial fresh recipes must match the number of entries for initial fresh assemblies.");
     }
   if (initial_spent_recipes.size() != initial_spent_amt.size()) {
-      throw ValueError("Number of entries for initial core recipes must match the number of entries for initial core amount.");
+      throw ValueError("Number of entries for initial spent recipes must match the number of entries for initial spent assemblies.");
     }
   
   InitializePosition();
