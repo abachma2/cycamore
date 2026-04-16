@@ -52,6 +52,36 @@ Composition::Ptr c_water() {
   return Composition::CreateFromAtom(m);
 };
 
+cyclus::MockSim MaterialInvErrorInput(std::string error_string){
+  std::string start_config =
+     "  <fuel_inrecipes>  <val>uox</val>      <val>mox</val>      </fuel_inrecipes>  "
+     "  <fuel_outrecipes> <val>spentuox</val> <val>spentmox</val> </fuel_outrecipes>  "
+     "  <fuel_incommods>  <val>uox</val>      <val>mox</val>      </fuel_incommods>  "
+     "  <fuel_outcommods> <val>waste</val>    <val>waste</val>    </fuel_outcommods>  "
+    ""
+    " <cycle_time>1</cycle_time> "
+    " <refuel_time>0</refuel_time> "
+    " <assem_size>8</assem_size> "
+    " <n_assem_core>8</n_assem_core> "
+    " <n_assem_batch>2</n_assem_batch> "
+    " <n_assem_fresh>5</n_assem_fresh> "
+    " <n_assem_spent>3</n_assem_spent> "
+    " <power_cap>100</power_cap> "
+    "";
+  
+  std::string config = start_config + error_string;
+
+  int simdur = 0;
+  cyclus::MockSim sim(cyclus::AgentSpec(":cycamore:Reactor"), config, simdur);
+  sim.AddSource("uox").capacity(2).Finalize();
+  sim.AddSource("mox").capacity(2).Finalize();
+  sim.AddRecipe("uox", c_uox());
+  sim.AddRecipe("spentuox", c_spentuox());
+  sim.AddRecipe("mox", c_spentuox());
+  sim.AddRecipe("spentmox", c_spentuox());
+  return sim;
+};
+
 // Test that with a zero refuel_time and a zero capacity fresh fuel buffer
 // (the default), fuel can be ordered and the cycle started with no time step
 // delay.
@@ -389,6 +419,37 @@ TEST(ReactorTests, InitialMaterialInventory) {
 
 }
 
+TEST(ReactorTests, InitialMaterialInventoryErrors) {
+
+  std::string error1 =
+    ""
+    " <initial_fresh_recipes> <val>uox</val> <val>mox</val> </initial_fresh_recipes> "
+    " <initial_fresh_amt> <val>6</val> </initial_fresh_amt> ";
+
+    EXPECT_THROW(MaterialInvErrorInput(error1).Run(), cyclus::ValueError);
+
+  std::string error2 =
+    ""
+    " <initial_core_recipes> <val>mox</val> <val>fueluox</val> </initial_core_recipes> "
+    " <initial_core_amt> <val>1</val> <val>2</val> </initial_core_amt> ";
+    EXPECT_THROW(MaterialInvErrorInput(error2).Run(), cyclus::KeyError);
+
+  //the reactor spent fuel buffer will never start to fill with the spentmox amount
+  //because already filled 
+  std::string error3 =
+    ""
+    " <initial_spent_recipes> <val>spentuox</val> <val>spentmox</val> </initial_spent_recipes> "
+    " <initial_spent_amt> <val>40</val> <val>7</val> </initial_spent_amt> ";
+    cyclus::warn_as_error = true;
+    EXPECT_THROW(MaterialInvErrorInput(error3).Run(), cyclus::ValueError);
+
+    std::string error4 =
+    ""
+    " <initial_spent_recipes> <val>spentuox</val> <val>spentmox</val> </initial_spent_recipes> "
+    " <initial_spent_amt> <val>2</val> <val>6</val> </initial_spent_amt> ";
+    EXPECT_THROW(MaterialInvErrorInput(error4).Run(), cyclus::ValueError);
+    cyclus::warn_as_error = false;
+}
 
 
 // tests that the reactor cycle is delayed as expected when it is unable to

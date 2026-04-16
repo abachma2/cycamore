@@ -188,7 +188,7 @@ class Reactor : public cyclus::Facility,
                      std::vector<int>& initial_amts, 
                      cyclus::toolkit::ResBuf<cyclus::Material>& buffer);
 
-  void InitialRecipes(std::vector<std::string>, std::vector<std::string>);
+  void ValidateInitialRecipes(std::vector<std::string>, std::vector<std::string>);
 
   /////// fuel specifications /////////
   #pragma cyclus var { \

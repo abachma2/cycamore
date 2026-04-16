@@ -105,23 +105,26 @@ void Reactor::EnterNotify() {
        << " pref_change_values vals, expected " << n << "\n";
   }
 
+  if (initial_core_recipes.size() != initial_core_amt.size()) {
+      ss << "Number of entries for initial core recipes, " << initial_core_recipes.size() 
+      << ", must match the number of entries for initial core assemblies, " << initial_core_amt.size() << "\n";
+    }
+  if (initial_fresh_recipes.size() != initial_fresh_amt.size()) {
+      ss << "Number of entries for initial fresh recipes, " << initial_fresh_recipes.size() 
+      << ", must match the number of entries for initial fresh assemblies, " << initial_fresh_amt.size() << "\n";
+    }
+  if (initial_spent_recipes.size() != initial_spent_amt.size()) {
+      ss << "Number of entries for initial spent recipes, " << initial_spent_recipes.size() 
+      << ", must match the number of entries for initial spent assemblies, " << initial_spent_amt.size() << "\n";
+    }
+  
   if (ss.str().size() > 0) {
     throw ValueError(ss.str());
   }
 
-  InitialRecipes(initial_fresh_recipes, fuel_inrecipes);
-  InitialRecipes(initial_core_recipes, fuel_inrecipes);
-  InitialRecipes(initial_spent_recipes, fuel_outrecipes);
-
-  if (initial_core_recipes.size() != initial_core_amt.size()) {
-      throw ValueError("Number of entries for initial core recipes must match the number of entries for initial core assemblies.");
-    }
-  if (initial_fresh_recipes.size() != initial_fresh_amt.size()) {
-      throw ValueError("Number of entries for initial fresh recipes must match the number of entries for initial fresh assemblies.");
-    }
-  if (initial_spent_recipes.size() != initial_spent_amt.size()) {
-      throw ValueError("Number of entries for initial spent recipes must match the number of entries for initial spent assemblies.");
-    }
+  ValidateInitialRecipes(initial_fresh_recipes, fuel_inrecipes);
+  ValidateInitialRecipes(initial_core_recipes, fuel_inrecipes);
+  ValidateInitialRecipes(initial_spent_recipes, fuel_outrecipes);
   
   InitializePosition();
 }
@@ -490,7 +493,7 @@ void Reactor::LoadInitial(std::vector<std::string>& initial_recipes,
 }
 
 
-void Reactor::InitialRecipes(std::vector<std::string> int_invs, std::vector<std::string> recipes){
+void Reactor::ValidateInitialRecipes(std::vector<std::string> int_invs, std::vector<std::string> recipes){
   for (int i = 0; i<int_invs.size(); i++) {
     if (std::find(recipes.begin(), recipes.end(), int_invs[i]) == recipes.end()) {
     throw KeyError("Recipe not associated with an in-commodity or out-commodity");
