@@ -15,6 +15,8 @@ Since last release
 * Added support for Ubuntu 24.04 (#633)
 * Added (negative)binomial distributions for disruption modeling to storage (#635)
 * Added new variable to Deploy Institution to shift the deployment times (#677)
+* Added variables to enrichment facility for initial tails inventory (#680)
+* Added variable to specify initial spent, fresh, and core inventory for reactor facility (#680)
 
 **Changed:**
 * Cleaned up manual definitions of Position in favor of code injection (#641)
