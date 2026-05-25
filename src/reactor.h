@@ -184,9 +184,13 @@ class Reactor : public cyclus::Facility,
   /// from the spent fuel buffer.
   std::map<std::string, cyclus::toolkit::MatVec> PeekSpent();
 
+  //loads any spent or fresh fuel assemblies into resource buffer
   void LoadInitial(std::vector<std::string>& initial_recipes,
                      std::vector<int>& initial_amts, 
                      cyclus::toolkit::ResBuf<cyclus::Material>& buffer);
+
+  //to be run with LoadInitial()
+  void PushInitialInv();
 
   void ValidateInitialRecipes(std::vector<std::string>, std::vector<std::string>);
 
@@ -324,50 +328,50 @@ class Reactor : public cyclus::Facility,
 
      ///////// initial inventory ///////////
   #pragma cyclus var { \
-  "default": [], \
-  "uilabel": "Recipe names for initial core inventory", \
-  "doc": "Specify an in-commodity recipe name that should have" \
-          "an initial inventory. This material will be added to the core as an assembly.", \
+    "default": [], \
+    "uilabel": "Recipe names for initial core inventory", \
+    "doc": "Specify an in-commodity recipe name that should have" \
+            "an initial inventory. This material will be added to the core as an assembly.", \
   }
   std::vector<std::string> initial_core_recipes;
 
   #pragma cyclus var { \
-  "default": [], \
-  "uilabel": "Number of assemblies for initial core inventory", \
-  "doc": "Specify an amount associated with an in-commidity recipe" \
-          "Same order as initial core recipes.", \
+    "default": [], \
+    "uilabel": "Number of assemblies for initial core inventory", \
+    "doc": "Specify an amount associated with an in-commidity recipe" \
+            "Same order as initial core recipes.", \
   }
   std::vector<int> initial_core_amt;
 
-  #pragma cyclus var { \
-  "default": [], \
-  "uilabel": "Recipe names for initial fresh fuel", \
-  "doc": "Specify an in-commodity recipe name that should have" \
-          "an initial inventory. This material will be added to the on-hand fresh fuel inventory as an assembly.", \
+    #pragma cyclus var { \
+    "default": [], \
+    "uilabel": "Recipe names for initial fresh fuel", \
+    "doc": "Specify an in-commodity recipe name that should have" \
+            "an initial inventory. This material will be added to the on-hand fresh fuel inventory as an assembly.", \
   }
   std::vector<std::string> initial_fresh_recipes;
 
   #pragma cyclus var { \
-  "default": [], \
-  "uilabel": " for initial fresh fuel inventory", \
-  "doc": "Specify an amount associated with an in-commidity recipe" \
-          "Same order as initial fresh recipes.", \
+    "default": [], \
+    "uilabel": "Number of assemblies for initial fresh fuel inventory", \
+    "doc": "Specify an amount associated with an in-commidity recipe" \
+            "Same order as initial fresh recipes.", \
   }
   std::vector<int> initial_fresh_amt;
 
   #pragma cyclus var { \
-  "default": [], \
-  "uilabel": "Recipe names for initial spent fuel inventory", \
-  "doc": "Specify an out-commodity recipe name that should have" \
-          "an initial inventory. This material will be added to the on-site spent fuel as a --.", \
+    "default": [], \
+    "uilabel": "Recipe names for initial spent fuel inventory", \
+    "doc": "Specify an out-commodity recipe name that should have" \
+            "an initial inventory.", \
   }
   std::vector<std::string> initial_spent_recipes;
 
   #pragma cyclus var { \
-  "default": [], \
-  "uilabel": "Number of assemblies for initial spent fuel inventory", \
-  "doc": "Specify an amount associated with an out-commidity recipe" \
-          "Same order as initial spent recipes.", \
+    "default": [], \
+    "uilabel": "Number of assemblies for initial spent fuel inventory", \
+    "doc": "Specify an amount associated with an out-commidity recipe" \
+            "Same order as initial spent recipes.", \
   }
   std::vector<int> initial_spent_amt;
   

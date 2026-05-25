@@ -200,7 +200,9 @@ TEST_F(EnrichmentTest, CheckInitialInventory) {
   conds.push_back(Cond("Time", "==", 0));
   QueryResult qr = sim.db().Query("TimeSeriessupplytails", &conds);
   
-  EXPECT_EQ(500, qr.GetVal<double>("Value"));
+  double tails_qty = 500.0;
+
+  EXPECT_EQ(tails_qty, qr.GetVal<double>("Value"));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -131,9 +131,7 @@ void Reactor::EnterNotify() {
 
 void Reactor::Build(cyclus::Agent* parent) {
   Facility::Build(parent);
-  LoadInitial(initial_fresh_recipes,initial_fresh_amt, fresh);
-  LoadInitial(initial_core_recipes,initial_core_amt, core);
-  LoadInitial(initial_spent_recipes,initial_spent_amt, spent);
+  PushInitialInv(); // load initial inventory into resource buffers 
 }
 
 bool Reactor::CheckDecommissionCondition() {
@@ -469,7 +467,6 @@ bool Reactor::Discharge() {
   return true;
 }
 
-// make sure that the 
 void Reactor::LoadInitial(std::vector<std::string>& initial_recipes,
                      std::vector<int>& initial_amts, 
                      cyclus::toolkit::ResBuf<cyclus::Material>& buffer) {
@@ -490,6 +487,12 @@ void Reactor::LoadInitial(std::vector<std::string>& initial_recipes,
     avail -= n_init_assems;
     idx++;
   }
+}
+
+void Reactor::PushInitialInv(){
+  LoadInitial(initial_fresh_recipes,initial_fresh_amt, fresh);
+  LoadInitial(initial_core_recipes,initial_core_amt, core);
+  LoadInitial(initial_spent_recipes,initial_spent_amt, spent);
 }
 
 
