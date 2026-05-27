@@ -430,7 +430,7 @@ TEST(ReactorTests, InitialMaterialInventoryErrors) {
 
   std::string invalid_recipe_err =
     ""
-    " <initial_core_recipes> <val>mox</val> <val>fueluox</val> </initial_core_recipes> "
+    " <initial_core_recipes> <val>mox</val> <val>invalid_recipe</val> </initial_core_recipes> "
     " <initial_core_amt> <val>1</val> <val>2</val> </initial_core_amt> ";
     EXPECT_THROW(MaterialInvErrorInput(invalid_recipe_err).Run(), cyclus::KeyError);
 
