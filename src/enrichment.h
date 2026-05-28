@@ -328,6 +328,14 @@ class Enrichment
   double initial_feed;
 
   #pragma cyclus var {							\
+    "default": 0, "tooltip": "initial tails (kg)",		\
+    "uilabel": "Initial tails Inventory",				\
+    "doc": "amount of tails stored at the enrichment "	\
+    "facility at the beginning of the simulation (kg) (based on recipe)"			\
+  }
+  double initial_tails;
+
+  #pragma cyclus var {							\
     "default": CY_LARGE_DOUBLE, "tooltip": "max inventory of feed material (kg)", \
     "uilabel": "Maximum Feed Inventory", \
     "uitype": "range", \
