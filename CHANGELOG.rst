@@ -19,6 +19,7 @@ Since last release
 * Added variable to specify initial spent, fresh, and core inventory for reactor facility (#680)
 
 **Changed:**
+* Some language in the storage cyclus note to make it match actual behavior (#690)
 * Cleaned up manual definitions of Position in favor of code injection (#641)
 * Rely on ``python3`` in environment instead of ``python`` (#602)
 * Link against ``libxml++`` imported target in CMake instead of ``LIBXMLXX_LIBRARIES`` (#608)
